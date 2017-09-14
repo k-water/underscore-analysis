@@ -1,0 +1,26 @@
+{
+  "name": "underscore-analysis",
+  "version": "1.0.0",
+  "description": "underscore-analysis",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k-water/underscore-analysis.git"
+  },
+  "keywords": [
+    "source",
+    "code"
+  ],
+  "author": "water",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/k-water/underscore-analysis/issues"
+  },
+  "homepage": "https://github.com/k-water/underscore-analysis#readme",
+  "dependencies": {
+    "underscore": "^1.8.3"
+  }
+}
