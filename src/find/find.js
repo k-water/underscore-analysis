@@ -170,3 +170,4 @@ _.find = _.detect = function (obj, predicate, context) {
   }
   if (key !== void 0 && key !== -1) return obj[key]
 }
+
