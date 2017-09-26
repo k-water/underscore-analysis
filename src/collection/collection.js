@@ -169,3 +169,18 @@ _.values = function (obj) {
   }
   return values
 }
+/**
+ * 在涉及分组的时候使用
+ * @param  behavior 获得组别之后的行为
+ */
+var group = function (behavior) {
+  return function (obj, iteratee, context) {
+    var result = {}
+    iteratee = cb(iteratee, context)
+    _.each(obj, function (value, index) {
+      var ke = iteratee(value, index, obj)
+      behavior(result, value, key)
+    })
+    return result
+  }
+}
