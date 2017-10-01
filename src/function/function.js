@@ -98,3 +98,105 @@ _.delay = function (func, wait) {
 }
 
 _.defer = _.partial(_.delay, _, 1)
+
+/**
+ * 返回一个节流函数 该函数的执行频率会被限制
+ * @param func 
+ * @param wait 等待时间
+ * @param options 一些配置 leading & tailing
+ */
+_.throttle = function (func, wait, options) {
+
+  // context 函数的执行上下文 args 函数执行所需要的函数 result 缓存func执行的result
+  var context, args, result
+  // timeout标识最近一次被追踪的调用
+  var timeout = null
+  // 最近一次func被调用的时间点
+  var previous = 0
+  // options提供两个参数的配置 leading &tailing
+  if (!options) options = {}
+  // 创建一个延后执行的函数
+  var later = function () {
+    // 执行时 刷新最近一次调用时间
+    previous = options.leading === false ? 0 : _.now()
+    // 清空定时器
+    timeout = null
+    result = func.apply(context, args)
+    if (!timeout) context = args = null
+  }
+  // 返回一个节流函数
+  return function () {
+    // 调用func时 记录当前的时间戳
+    var now = _.now()
+    // 判断是否是第一次调用
+    if (!previous && options.leading === false) prevous = now
+    // 延时执行的时间
+    // wait - (当前时间 - 上一次调用的时间)
+    var remaining = wait - (now - previous)
+    // 记录func的执行上下文和参数
+    context = this
+    args = arguments
+    // 通过计算判断是否能立即执行
+    if (remaining <= 0 || remaining > wait) {
+      // 清除之前的延时执行 排除回调在同一时间发生的情况
+      if (timeout) {
+        clearTimeout(timeout)
+        timeout = null
+      }
+      // 刷新最近一次func被调用的时间点
+      previous = now
+      // 执行func
+      result = func.apply(context, args)
+      // 再次检查timeout 因为func再执行的过程中可能会有新的timeout被设置
+      // 如果timeout被清空了 那么context args也没意义 清空context和args
+      if (!timeout) context = args = null
+    } else if (!timeout && options.tailing !== false) {
+      // 如果设置了tailing 暂缓此次调用
+      timeout = setTimeout(later, remaining)
+    }
+    // 返回func执行的结果
+    return result
+  }
+}
+
+/**
+ * 防抖函数
+ * @param func
+ * @param wait 等待时间
+ * @param immediate 是否允许立即执行
+ */
+_.debounce = function (func, wait, immediate) {
+  // timeout 定时器 context 执行下文 args 函数执行参数
+  // timestamp 当前时间戳 result 缓存func执行结果
+  var timeout, args, context, timestamp, result
+  var later = function () {
+    // 最后一次调用
+    var last = _.now() - timestamp
+    if (last < wait && last >= 0) {
+      // 刷新timeout
+      timeout = setTimeout(later, wait - last)
+    } else {
+      // 清空定时器
+      timeout = null
+      if (!immediate) {
+        // 执行func
+        result = func.apply(context, args)
+        if (!timeout) context = args = null
+      }
+    }
+  }
+  return function () {
+    context = this
+    args = arguments
+    // 当前时间戳
+    timestamp = _.now()
+    // 能否被立即执行
+    var callNow = immediate && !timeout
+    if (!timeout) timeout = setTimeout(later, wait)
+    if (callNow) {
+      result = func.apply(context, args)
+      context = args = null
+    }
+    return result
+  }
+}
