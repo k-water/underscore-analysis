@@ -200,3 +200,72 @@ _.debounce = function (func, wait, immediate) {
     return result
   }
 }
+
+/**
+ * 返回函数序列的组合
+ * 执行函数组合的时候 不断执行函数组合中的函数
+ * 并把当前函数执行的结果作为参数传递给下一函数做
+ * 如果传入的函数的序列是 A B C
+ * 执行的顺序则为 C B A
+ */
+_.compose = function () {
+  // 获得函数组合
+  var args = arguments
+  // 以最后一个传入的函数作为首个执行的
+  var start = args.length - 1
+  return function () {
+    // 逐个执行 获得结果
+    var i = start
+    var result = args[start].apply(this, arguments)
+    while (i--) result = args[i].call(this, result)
+    return result
+  }
+}
+
+/**
+ * 返回一个after函数
+ * 该函数执行times次后
+ * 每次执行都会执行回调函数func
+ */
+_.after = function (times, func) {
+  return function () {
+    if (--times < 1) {
+      return func.apply(this, arguments)
+    }
+  }
+}
+
+/**
+ * 返回一个before函数
+ * 该函数在执行times之前
+ * 每次执行都会执行回调函数func并返回结果
+ * 执行times次后
+ * before不再变化
+ */
+_.before = function (times, func) {
+  // 缓存最近一次执行func的结果 当执行times后
+  // memo不再变化
+  var memo
+  return function () {
+    if (--times > 0) {
+      memo = func.apply(this, arguments)
+    }
+    if (time <= 1) func = null
+    return memo
+  }
+}
+
+/**
+ * 应用偏函数
+ * 包装_.before函数
+ * 保证一个函数只执行一次
+ */
+_.once = _.partial(_.before, 2)
+
+/**
+ * 使用wrapper对func进行包裹
+ * 使func的执行前后能融入更多的业务逻辑
+ */
+_.wrap = function(func, wrapper) {
+  return _.partial(wrapper, func)
+}
